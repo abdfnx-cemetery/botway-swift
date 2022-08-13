@@ -2,6 +2,7 @@ import Foundation
 
 struct BW: Codable {
     let botway: Botway
+    let user: User
 }
 
 struct Botway: Codable {
@@ -19,19 +20,22 @@ struct Bots: Codable {
 }
 
 struct {{.BotName}}: Codable {
-    let type, path, lang, botToken, signingSecret: String
+    let type, path, lang, botToken: String
     let botAppID: String?
 
     enum CodingKeys: String, CodingKey {
         case type, path, lang
         case botToken = "bot_token"
-        case signingSecret = "signing_secret"
+        case botAppID = "bot_app_id"
+    }
+}
 
-        if (type == "slack") {
-            case botAppID = "bot_app_token"
-        } else {
-            case botAppID = "bot_app_id"
-        }
+struct User: Codable {
+    let dockerID, githubUsername: String
+
+    enum CodingKeys: String, CodingKey {
+        case dockerID = "docker_id"
+        case githubUsername = "github_username"
     }
 }
 
@@ -44,14 +48,10 @@ let botwayConfigPath = NSString(string: NSHomeDirectory())
 let config = try? Data(contentsOf: URL(fileURLWithPath: botwayConfigPath))
 let botwayConfig = try? JSONDecoder().decode(BW.self, from: config!)
 
-func GetToken() -> String {
+public func GetToken() -> String {
     return botwayConfig!.botway.bots.{{.BotName}}.botToken
 }
 
-func GetAppId() -> String {
+public func GetAppId() -> String {
     return botwayConfig!.botway.bots.{{.BotName}}.botAppID!
-}
-
-func GetSigningSecret() -> String {
-    return botwayConfig!.botway.bots.{{.BotName}}.signingSecret
 }
